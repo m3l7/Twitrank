@@ -11,9 +11,9 @@ CONS_SEC = 'XdabDKXnDGcdXpDn9glgsCsCQYgafsyVF7KAWPTHo'
 ACC_TOK = '55229276-H7Ae0RgERvBCroEn2W8CZDsKhxcouf4dIJpEkDMxQ'
 ACC_TOK_SEC = 'VYvzuDMNOYTYsrhpERQD5VDmY81ZJDWODaL9FTJOg'
 
-#SEARCH_TERM = ['#apple']
+#SEARCH_TERM = ['#apple','osx']
 SEARCH_TERM = ['#apple OR osx OR #mac OR ipad OR ipod OR #lion']
-FILE_OUT = 'apple3'
+FILE_OUT = 'out/apple3'
 SLEEP = 60
 AUTO_RESUME = False
 RESUME_ID = 0 
@@ -41,8 +41,6 @@ if (AUTO_RESUME==False):
     id = RESUME_ID
 twit_counter=0
 
-#try:
-#last_dt = twit2date(api.GetSearch(SEARCH_TERM[0], geocode=None, since_id=id, per_page=1)[0])
 last_dt = datetime.datetime.today() 
 
 initialized=False
@@ -74,6 +72,5 @@ while (True):
                 bck = x[t1]
                 x[t1]=x[t2]
                 x[t2]=bck
-		
     for t in x:
-	    write_twit(t,twit2date(t))
+        write_twit(t,twit2date(t))
