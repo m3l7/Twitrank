@@ -4,20 +4,23 @@ import pytz
 import datetime
 import socket
 
-socket.setdefaulttimeout(10)
+
+SEARCH_TERM = ['#apple OR osx OR #mac OR ipad OR ipod OR #lion']
+FILE_OUT = 'out/apple3'
+SLEEP = 720
+DEBUG = True
 
 CONS_KEY = 'YmjPguNHsOmCpDgGJ82Gmw'
 CONS_SEC = 'XdabDKXnDGcdXpDn9glgsCsCQYgafsyVF7KAWPTHo'
 ACC_TOK = '55229276-H7Ae0RgERvBCroEn2W8CZDsKhxcouf4dIJpEkDMxQ'
 ACC_TOK_SEC = 'VYvzuDMNOYTYsrhpERQD5VDmY81ZJDWODaL9FTJOg'
 
-#SEARCH_TERM = ['#apple','osx']
-SEARCH_TERM = ['#apple OR osx OR #mac OR ipad OR ipod OR #lion']
-FILE_OUT = 'out/apple3'
-SLEEP = 60
-AUTO_RESUME = False
-RESUME_ID = 0 
+USE_PAGES=True
+AUTO_RESUME = False #set always false FIXME
+RESUME_ID = 0
+SYNC_OLD_TWITS = False
 
+socket.setdefaulttimeout(10)
 api = twitter.Api(CONS_KEY,CONS_SEC,ACC_TOK,ACC_TOK_SEC)
 
 def dt2format(dt):
@@ -42,27 +45,33 @@ if (AUTO_RESUME==False):
 twit_counter=0
 
 last_dt = datetime.datetime.today() 
+init=False
 
-initialized=False
 while (True):
+    
+    if (DEBUG==True): print(time_formatted()+' new search')
     x = []
     last_id=id
     for i in SEARCH_TERM:
-        try:
-            src = api.GetSearch(i, geocode=None, since_id=id, per_page=100,page=1 )
-        except Exception, err:
-            print('Warning: '+time_formatted()+str(err))
-            break
-        for twit in src:
-            add = True
-            for oldtwit in x:
-                if (twit.id==oldtwit.id):
-                    add=False
-                    break
-            if (add==True):
-                x.append(twit)
-                dt = twit2date(twit) 
-                if (twit.id>last_id): last_id=twit.id                
+        for pg in range(1,16):
+            try:
+                src = api.GetSearch(i, geocode=None, since_id=id, per_page=100,page=pg )
+            except Exception, err:
+                print('Warning: '+time_formatted()+str(err))
+                break
+            for twit in src:
+                add = True
+                for oldtwit in x:
+                    if (twit.id==oldtwit.id):
+                        add=False
+                        break
+                if (add==True):
+                    x.append(twit)
+                    dt = twit2date(twit) 
+                    if (twit.id>last_id): last_id=twit.id
+            if (DEBUG==True): print('Fetching page '+str(pg)+'. Length: '+str(len(src)))
+            if ((USE_PAGES==False) or (len(src)<100)): break
+            if ((init==False) and (SYNC_OLD_TWITS==False)): break                
     id=last_id
 
     #make twits in ascending order
@@ -74,3 +83,6 @@ while (True):
                 x[t2]=bck
     for t in x:
         write_twit(t,twit2date(t))
+        
+    init=True
+    time.sleep(SLEEP)
