@@ -7,8 +7,10 @@ import socket
 
 SEARCH_TERM = ['#apple OR osx OR #mac OR ipad OR ipod OR #lion']
 FILE_OUT = 'out/apple3'
+DAEMON=False            
 SLEEP = 720
 DEBUG = True
+
 
 CONS_KEY = 'YmjPguNHsOmCpDgGJ82Gmw'
 CONS_SEC = 'XdabDKXnDGcdXpDn9glgsCsCQYgafsyVF7KAWPTHo'
@@ -71,7 +73,7 @@ while (True):
                     if (twit.id>last_id): last_id=twit.id
             if (DEBUG==True): print('Fetching page '+str(pg)+'. Length: '+str(len(src)))
             if ((USE_PAGES==False) or (len(src)<100)): break
-            if ((init==False) and (SYNC_OLD_TWITS==False)): break                
+            if ((init==False) and (SYNC_OLD_TWITS==False)): break  
     id=last_id
 
     #make twits in ascending order
@@ -84,5 +86,6 @@ while (True):
     for t in x:
         write_twit(t,twit2date(t))
         
+    if (DAEMON==False): break               
     init=True
     time.sleep(SLEEP)
